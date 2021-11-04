@@ -24,7 +24,6 @@ public class BillDetails {
     private String categoryId;
 
     @NotNull(message="type must not be null")
-
     private String type;
 
     @NotNull(message="amount must not be null")
