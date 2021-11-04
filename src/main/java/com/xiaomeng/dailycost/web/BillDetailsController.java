@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ public class BillDetailsController {
     private BillDetailsService billDetailsService;
 
     @PostMapping("/details")
-    public Map<String, Object> create(@RequestBody BillDetails billDetails) {
+    public Map<String, Object> create(@Valid @RequestBody BillDetails billDetails) {
         Map<String, Object> map = new HashMap<>();
         BillDetails createdBillDetails = billDetailsService.create(billDetails);
         map.put("id",createdBillDetails.getId());

@@ -15,11 +15,10 @@ public class BillDetailsService {
     }
 
     @Transactional( rollbackOn = Exception.class)
-    public BillDetails create(BillDetails billDetails) {
+    public BillDetails create(BillDetails billDetails){
         billDetails.setCreatedBy("molly");
         billDetails.setCreatedTime(System.currentTimeMillis());
         billDetails.setUpdatedTime(System.currentTimeMillis());
-        BillDetails createdBillDetails = billDetailsRepository.save(billDetails);
-        return createdBillDetails;
+        return billDetailsRepository.save(billDetails);
     }
 }
