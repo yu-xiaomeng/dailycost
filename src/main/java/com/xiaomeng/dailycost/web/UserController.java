@@ -22,11 +22,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@Valid @RequestBody UserLoginDto user) {
-        try {
-            return userService.login(user.getUsername(), user.getPassword());
-        } catch (Exception e) {
-            return "请输入正确的用户名和密码";
-        }
+    public String login(@Valid @RequestBody UserLoginDto user) throws BusinessException{
+
+        return userService.login(user.getUsername(), user.getPassword());
+
     }
 }

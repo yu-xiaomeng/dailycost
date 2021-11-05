@@ -5,6 +5,7 @@ import com.xiaomeng.dailycost.domain.UserRepository;
 import com.xiaomeng.dailycost.dto.UserSignupDto;
 import com.xiaomeng.dailycost.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -49,14 +50,19 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user).getId();
     }
 
-    public String login(String username, String password) {
+    public String login(String username, String password) throws BusinessException{
         String encodePassword = passwordEncoder.encode(password);
-        User user = userRepository.findByUsernameAndPassword(username,encodePassword);
-        if( user != null) {
-            return user.getId();
-        } else {
-            return "请输入正确的用户名和密码";
+        try {
+            User user = userRepository.findByUsernameAndPassword(username, encodePassword);
+            if (user != null) {
+                return user.getId();
+            }
+        } catch (Exception e){
+            throw new BusinessException(RC_USERNAME_OR_PASSWORD_ERROR);
+//            return "请输入正确的用户名和密码";
         }
+        return null;
+
     }
 
     @Override
