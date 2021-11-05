@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
@@ -23,7 +24,7 @@ public class BillDetails {
     @NotNull(message="categoryId must not be null")
     private String categoryId;
 
-    @NotNull(message="type must not be null")
+    @Pattern(regexp="^EXPENSE$|^INCOME$",message="type must be EXPENSE or INCOME")
     private String type;
 
     @NotNull(message="amount must not be null")

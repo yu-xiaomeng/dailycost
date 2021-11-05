@@ -8,9 +8,10 @@ public enum ReturnCode {
     /**操作失败**/
     RC999(999,"操作失败"),
     /**服务异常**/
-    RC500(500,"系统异常，请稍后重试");
+    RC500(500,"系统异常，请稍后重试"),
 
-
+    RC_USERNAME_EXIST(400, "用户名已被占用"),
+    RC_EMAIL_EXIST(400, "邮箱已使用过");
 
     /**自定义状态码**/
     private final int code;

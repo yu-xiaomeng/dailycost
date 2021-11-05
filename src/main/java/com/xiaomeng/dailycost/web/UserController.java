@@ -2,6 +2,7 @@ package com.xiaomeng.dailycost.web;
 
 import com.xiaomeng.dailycost.dto.UserLoginDto;
 import com.xiaomeng.dailycost.dto.UserSignupDto;
+import com.xiaomeng.dailycost.exception.BusinessException;
 import com.xiaomeng.dailycost.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/user")
-    public String create(@Valid @RequestBody UserSignupDto user) {
+    public String create(@Valid @RequestBody UserSignupDto user) throws BusinessException {
         return userService.create(user);
     }
 
