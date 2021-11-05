@@ -12,6 +12,7 @@ public enum ReturnCode {
 
     RC_USERNAME_EXIST(400, "用户名已被占用"),
     RC_EMAIL_EXIST(400, "邮箱已使用过"),
+    // Todo: catch the Exception in JWTAuthenticationFilter
     RC_USERNAME_OR_PASSWORD_ERROR(400, "用户名或密码错误");
 
     /**自定义状态码**/
