@@ -10,4 +10,7 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category, String> {
     @Query(value ="select * from category where name = ?1 and created_by = ?2", nativeQuery = true)
     Optional<Category> findByName(String name, String username);
+
+    @Query(value ="select * from category where id = ?1 and type = ?2 and created_by = ?3", nativeQuery = true)
+    Optional<Category> findByIdTypeUser(String id, String type, String username);
 }
