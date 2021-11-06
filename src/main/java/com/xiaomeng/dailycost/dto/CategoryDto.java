@@ -9,7 +9,7 @@ import javax.validation.constraints.Size;
 @Data
 public class CategoryDto {
     @NotNull(message="category name must not be null")
-    @Size(min=4, max=50, message="category name length must between 4 and 20")
+    @Size(min=1, max=8, message="category name length must between 1 and 8")
     private String name;
 
     @NotNull(message="type must not be null")
