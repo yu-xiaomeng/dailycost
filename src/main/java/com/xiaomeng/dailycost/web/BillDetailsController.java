@@ -1,7 +1,12 @@
 package com.xiaomeng.dailycost.web;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.xiaomeng.dailycost.domain.BillDetails;
+import com.xiaomeng.dailycost.dto.BillDetailsDto;
+import com.xiaomeng.dailycost.exception.BaseException;
+import com.xiaomeng.dailycost.exception.BusinessException;
 import com.xiaomeng.dailycost.service.BillDetailsService;
+import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,11 +24,15 @@ public class BillDetailsController {
     private BillDetailsService billDetailsService;
 
     @PostMapping("/details")
-    public Map<String, Object> create(@Valid @RequestBody BillDetails billDetails) {
-        Map<String, Object> map = new HashMap<>();
-        BillDetails createdBillDetails = billDetailsService.create(billDetails);
-        map.put("id",createdBillDetails.getId());
-        return map;
+    public Map<String, Object> create(@Valid @RequestBody BillDetailsDto billDetailsDto) throws Exception{
+        try {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", billDetailsService.create(billDetailsDto));
+            return map;
+        } catch (Exception e) {
+            throw e;
+        }
+
     }
 
 }
