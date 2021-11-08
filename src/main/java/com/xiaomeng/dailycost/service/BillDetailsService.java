@@ -6,13 +6,14 @@ import com.xiaomeng.dailycost.domain.BillDetailsRepository;
 import com.xiaomeng.dailycost.domain.CategoryRepository;
 import com.xiaomeng.dailycost.dto.BillDetailsDto;
 import com.xiaomeng.dailycost.exception.BusinessException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class BillDetailsService {
@@ -46,5 +47,10 @@ public class BillDetailsService {
         billDetails.setUpdatedTime(System.currentTimeMillis());
         return billDetailsRepository.saveAndFlush(billDetails).getId();
 
+    }
+
+    public List<BillDetails> findCurrentMonthBills(Date date) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return billDetailsRepository.findByDate(date, username);
     }
 }

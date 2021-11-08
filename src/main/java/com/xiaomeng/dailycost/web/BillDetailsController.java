@@ -6,15 +6,16 @@ import com.xiaomeng.dailycost.dto.BillDetailsDto;
 import com.xiaomeng.dailycost.exception.BaseException;
 import com.xiaomeng.dailycost.exception.BusinessException;
 import com.xiaomeng.dailycost.service.BillDetailsService;
+import lombok.SneakyThrows;
 import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -33,6 +34,13 @@ public class BillDetailsController {
             throw e;
         }
 
+    }
+
+    @SneakyThrows
+    @GetMapping("/details/list")
+    public List<BillDetails> findByDate(@RequestParam String date) {
+        Date d = new SimpleDateFormat("yyyy-MM").parse(date);
+        return billDetailsService.findCurrentMonthBills(d);
     }
 
 }
