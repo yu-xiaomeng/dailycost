@@ -1,9 +1,7 @@
 package com.xiaomeng.dailycost.service;
 
 import com.xiaomeng.dailycost.base.ReturnCode;
-import com.xiaomeng.dailycost.domain.BillDetails;
-import com.xiaomeng.dailycost.domain.BillDetailsRepository;
-import com.xiaomeng.dailycost.domain.CategoryRepository;
+import com.xiaomeng.dailycost.domain.*;
 import com.xiaomeng.dailycost.dto.BillDetailsDto;
 import com.xiaomeng.dailycost.exception.BusinessException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,19 +12,22 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BillDetailsService {
     private BillDetailsRepository billDetailsRepository;
     private CategoryRepository categoryRepository;
+    private BillRepository billRepository;
 
-    public BillDetailsService(BillDetailsRepository billDetailsRepository, CategoryRepository categoryRepository) {
+    public BillDetailsService(BillDetailsRepository billDetailsRepository, CategoryRepository categoryRepository, BillRepository billRepository) {
         this.billDetailsRepository = billDetailsRepository;
-        this.categoryRepository=categoryRepository;
+        this.categoryRepository = categoryRepository;
+        this.billRepository = billRepository;
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public String create(BillDetailsDto billDetailsDto) throws ParseException {
+    public String create(BillDetailsDto billDetailsDto) throws Exception {
         BillDetails billDetails = new BillDetails();
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         billDetails.setCreatedBy(username);
@@ -45,11 +46,39 @@ public class BillDetailsService {
 
         billDetails.setCreatedTime(System.currentTimeMillis());
         billDetails.setUpdatedTime(System.currentTimeMillis());
-        return billDetailsRepository.saveAndFlush(billDetails).getId();
+
+        String billDetailsId = billDetailsRepository.saveAndFlush(billDetails).getId();
+
+        // update or insert to bill
+        Bill bill = billRepository.findByDate(billDetails.getDate(), username);
+
+        if (bill != null) {
+            if( type.equals("EXPENSE") ) {
+                bill.setExpense(bill.getExpense() + billDetails.getAmount());
+            } else {bill.setIncome(bill.getIncome() + billDetails.getAmount());}
+            bill.setBalance(bill.getIncome() - bill.getExpense());
+            billRepository.save(bill);
+        } else if( bill == null ){
+            Bill newBill = new Bill();
+            newBill.setTimeDimension("day");
+            newBill.setDate(billDetails.getDate());
+            if( type.equals("EXPENSE") ) {
+                newBill.setExpense(billDetails.getAmount());
+                newBill.setIncome(0.00);
+            } else if(type.equals("INCOME")) {
+                newBill.setExpense(0.00);
+                newBill.setIncome(billDetails.getAmount());
+            }
+            newBill.setBalance(newBill.getIncome() - newBill.getExpense());
+            newBill.setUsername(username);
+            billRepository.save(newBill);
+        }
+
+        return billDetailsId;
 
     }
 
-    public List<BillDetails> findCurrentMonthBills(Date date) {
+    public List<BillDetails> findByMonth(Date date) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return billDetailsRepository.findByDate(date, username);
     }

@@ -1,13 +1,9 @@
 package com.xiaomeng.dailycost.web;
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.xiaomeng.dailycost.domain.BillDetails;
 import com.xiaomeng.dailycost.dto.BillDetailsDto;
-import com.xiaomeng.dailycost.exception.BaseException;
-import com.xiaomeng.dailycost.exception.BusinessException;
 import com.xiaomeng.dailycost.service.BillDetailsService;
 import lombok.SneakyThrows;
-import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +36,7 @@ public class BillDetailsController {
     @GetMapping("/details/list")
     public List<BillDetails> findByDate(@RequestParam String date) {
         Date d = new SimpleDateFormat("yyyy-MM").parse(date);
-        return billDetailsService.findCurrentMonthBills(d);
+        return billDetailsService.findByMonth(d);
     }
 
 }
