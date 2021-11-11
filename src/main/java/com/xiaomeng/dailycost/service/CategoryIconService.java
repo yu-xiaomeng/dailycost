@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryIconService {
@@ -17,5 +18,9 @@ public class CategoryIconService {
 
     public List<CategoryIcon> getAllCategoryIcon() {
         return categoryIconRepository.findAll();
+    }
+
+    public Optional<CategoryIcon> findById(String id) {
+        return categoryIconRepository.findById(id);
     }
 }

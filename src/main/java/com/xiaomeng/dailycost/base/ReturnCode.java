@@ -17,8 +17,9 @@ public enum ReturnCode {
 
     RC_CATEGORY_ICON_NOT_EXIST(400, "类别ICON不存在"),
     RC_CATEGORY_NAME_EXIST(400,"类别名称已存在"),
+    RC_CATEGORY_NOT_MATCH(400,"记账类别不匹配"),
 
-    RC_CATEGORY_NOT_MATCH(400,"记账类别不匹配");
+    RC_ID_NOT_EXIST(400, "ID不存在");
 
     /**自定义状态码**/
     private final int code;

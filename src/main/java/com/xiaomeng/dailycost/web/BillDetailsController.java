@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/bill")
@@ -37,6 +34,11 @@ public class BillDetailsController {
     public List<BillDetails> findByDate(@RequestParam String date) {
         Date d = new SimpleDateFormat("yyyy-MM").parse(date);
         return billDetailsService.findByMonth(d);
+    }
+
+    @GetMapping("/details/{id}")
+    public Optional<BillDetails> findById(@PathVariable String id) {
+        return billDetailsService.findById(id);
     }
 
 }

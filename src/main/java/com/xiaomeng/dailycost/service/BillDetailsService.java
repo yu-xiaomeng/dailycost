@@ -82,4 +82,13 @@ public class BillDetailsService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return billDetailsRepository.findByDate(date, username);
     }
+
+    public Optional<BillDetails> findById(String id) {
+        //Todo: user can only access their own data
+        Optional<BillDetails> foundBillDetails = billDetailsRepository.findById(id);
+        if (foundBillDetails.isPresent()) {
+            return foundBillDetails;
+        }
+        throw new BusinessException(ReturnCode.RC_ID_NOT_EXIST);
+    }
 }

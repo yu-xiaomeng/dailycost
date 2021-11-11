@@ -9,6 +9,8 @@ import com.xiaomeng.dailycost.exception.BusinessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class CategoryService {
     private CategoryRepository categoryRepository;
@@ -39,5 +41,9 @@ public class CategoryService {
         }
 
         return categoryRepository.save(category).getId();
+    }
+
+    public Optional<Category> findById(String id) {
+        return categoryRepository.findById(id);
     }
 }
