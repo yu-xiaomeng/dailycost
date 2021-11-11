@@ -9,6 +9,8 @@ import javax.validation.constraints.Size;
 
 @Data
 public class BillDetailsDto {
+    private String id;
+
     @NotNull(message="categoryId must not be null")
     private String categoryId;
 

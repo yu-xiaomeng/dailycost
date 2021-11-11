@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -39,6 +40,11 @@ public class BillDetailsController {
     @GetMapping("/details/{id}")
     public Optional<BillDetails> findById(@PathVariable String id) {
         return billDetailsService.findById(id);
+    }
+
+    @PutMapping("/details")
+    public String update(@Valid @RequestBody BillDetailsDto billDetailsDto) throws ParseException {
+        return billDetailsService.update(billDetailsDto);
     }
 
 }

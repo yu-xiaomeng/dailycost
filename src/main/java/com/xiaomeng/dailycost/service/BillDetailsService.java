@@ -91,4 +91,37 @@ public class BillDetailsService {
         }
         throw new BusinessException(ReturnCode.RC_ID_NOT_EXIST);
     }
+
+    @Transactional(rollbackOn = Exception.class)
+    public String update(BillDetailsDto billDetailsDto) throws ParseException {
+        Optional<BillDetails> existedBillDetails = billDetailsRepository.findById(billDetailsDto.getId());
+        if (existedBillDetails.isPresent()) {
+            BillDetails billDetails = new BillDetails();
+            billDetails.setId(billDetailsDto.getId());
+
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            if (username.equals(existedBillDetails.get().getCreatedBy()) == false) {
+                throw new BusinessException(ReturnCode.RC_NO_DATA_ACCESS_AUTHRITY);
+            }
+            billDetails.setCreatedBy(username);
+
+            String categoryId = billDetailsDto.getCategoryId();
+            String type = billDetailsDto.getType();
+
+            if(categoryRepository.findByIdTypeUser(categoryId, type, username).isPresent()) {
+                billDetails.setType(type);
+            } else throw new BusinessException(ReturnCode.RC_CATEGORY_NOT_MATCH);
+
+            billDetails.setCategoryId(categoryId);
+            billDetails.setAmount(billDetailsDto.getAmount());
+            billDetails.setNote(billDetailsDto.getNote());
+            billDetails.setDate(new SimpleDateFormat("yyyy-MM-dd").parse(billDetailsDto.getDate()));
+
+            billDetails.setCreatedTime(existedBillDetails.get().getCreatedTime());
+            billDetails.setUpdatedTime(System.currentTimeMillis());
+
+            return billDetailsRepository.saveAndFlush(billDetails).getId();
+        }
+        throw new BusinessException(ReturnCode.RC_ID_NOT_EXIST);
+    }
 }
