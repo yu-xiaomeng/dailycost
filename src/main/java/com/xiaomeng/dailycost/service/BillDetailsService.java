@@ -117,4 +117,17 @@ public class BillDetailsService {
         }
         throw new BusinessException(ReturnCode.RC_ID_NOT_EXIST);
     }
+
+    public void delete(String id) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<BillDetails> found = billDetailsRepository.findById(id);
+        if(found.isPresent()) {
+            if(found.get().getCreatedBy().equals(username)) {
+                billDetailsRepository.deleteById(id);
+                return;
+            }
+            throw new BusinessException(ReturnCode.RC_NO_DATA_ACCESS_AUTHRITY);
+        }
+        throw new BusinessException(ReturnCode.RC_ID_NOT_EXIST);
+    }
 }

@@ -65,4 +65,9 @@ public class BillDetailsController {
         return billDetailsService.update(billDetailsDto);
     }
 
+    @DeleteMapping("/details/{id}")
+    public void delete(@PathVariable String id) {
+        billDetailsService.delete(id);
+    }
+
 }
