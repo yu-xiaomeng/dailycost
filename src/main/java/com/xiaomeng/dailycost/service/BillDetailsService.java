@@ -77,10 +77,13 @@ public class BillDetailsService {
     }
 
     public Optional<BillDetails> findById(String id) {
-        //Todo: user can only access their own data
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<BillDetails> foundBillDetails = billDetailsRepository.findById(id);
         if (foundBillDetails.isPresent()) {
-            return foundBillDetails;
+            if(foundBillDetails.get().getCreatedBy().equals(username)) {
+                return foundBillDetails;
+            }
+            throw new BusinessException(ReturnCode.RC_NO_DATA_ACCESS_AUTHRITY);
         }
         throw new BusinessException(ReturnCode.RC_ID_NOT_EXIST);
     }
