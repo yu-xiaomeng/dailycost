@@ -3,6 +3,7 @@ package com.xiaomeng.dailycost.service;
 import com.xiaomeng.dailycost.base.ReturnCode;
 import com.xiaomeng.dailycost.domain.*;
 import com.xiaomeng.dailycost.dto.BillDetailsDto;
+import com.xiaomeng.dailycost.dto.BillDto;
 import com.xiaomeng.dailycost.exception.BusinessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -10,20 +11,16 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class BillDetailsService {
     private BillDetailsRepository billDetailsRepository;
     private CategoryRepository categoryRepository;
-    private BillRepository billRepository;
 
-    public BillDetailsService(BillDetailsRepository billDetailsRepository, CategoryRepository categoryRepository, BillRepository billRepository) {
+    public BillDetailsService(BillDetailsRepository billDetailsRepository, CategoryRepository categoryRepository) {
         this.billDetailsRepository = billDetailsRepository;
         this.categoryRepository = categoryRepository;
-        this.billRepository = billRepository;
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -47,40 +44,36 @@ public class BillDetailsService {
         billDetails.setCreatedTime(System.currentTimeMillis());
         billDetails.setUpdatedTime(System.currentTimeMillis());
 
-        String billDetailsId = billDetailsRepository.saveAndFlush(billDetails).getId();
-
-        // update or insert to bill
-        Bill bill = billRepository.findByDate(billDetails.getDate(), username);
-
-        if (bill != null) {
-            if( type.equals("EXPENSE") ) {
-                bill.setExpense(bill.getExpense() + billDetails.getAmount());
-            } else {bill.setIncome(bill.getIncome() + billDetails.getAmount());}
-            bill.setBalance(bill.getIncome() - bill.getExpense());
-            billRepository.save(bill);
-        } else if( bill == null ){
-            Bill newBill = new Bill();
-            newBill.setTimeDimension("day");
-            newBill.setDate(billDetails.getDate());
-            if( type.equals("EXPENSE") ) {
-                newBill.setExpense(billDetails.getAmount());
-                newBill.setIncome(0.00);
-            } else if(type.equals("INCOME")) {
-                newBill.setExpense(0.00);
-                newBill.setIncome(billDetails.getAmount());
-            }
-            newBill.setBalance(newBill.getIncome() - newBill.getExpense());
-            newBill.setUsername(username);
-            billRepository.save(newBill);
-        }
-
-        return billDetailsId;
+        return billDetailsRepository.saveAndFlush(billDetails).getId();
 
     }
 
     public List<BillDetails> findByMonth(Date date) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return billDetailsRepository.findByDate(date, username);
+    }
+
+    public BillDto findBillByDay(Date date) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<BillDetails> billDetails = billDetailsRepository.findByDay(date, username);
+
+//        Map<String, Object> map = new HashMap<>();
+        BillDto billDto = new BillDto();
+
+        Double expense = 0.0;
+        Double income = 0.0;
+        for (BillDetails bill: billDetails) {
+            if(bill.getType().equals("EXPENSE")) {
+                expense += bill.getAmount();
+            } else if(bill.getType().equals("INCOME")) {
+                income += bill.getAmount();
+            }
+        }
+        billDto.setDate(new SimpleDateFormat("yyyy-MM-dd").format(date));
+        billDto.setExpense(expense);
+        billDto.setIncome(income);
+        billDto.setBillDetails(billDetails);
+        return billDto;
     }
 
     public Optional<BillDetails> findById(String id) {
