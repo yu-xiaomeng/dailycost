@@ -6,6 +6,7 @@ import com.xiaomeng.dailycost.dto.UserSignupDto;
 import com.xiaomeng.dailycost.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -63,6 +64,11 @@ public class UserService implements UserDetailsService {
         }
         return null;
 
+    }
+
+    public String getProfile() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findAvatar(username);
     }
 
     @Override
