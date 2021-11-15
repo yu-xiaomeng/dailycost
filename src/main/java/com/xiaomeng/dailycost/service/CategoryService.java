@@ -9,6 +9,7 @@ import com.xiaomeng.dailycost.exception.BusinessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -45,5 +46,10 @@ public class CategoryService {
 
     public Optional<Category> findById(String id) {
         return categoryRepository.findById(id);
+    }
+
+    public List<Category> findAllByUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return categoryRepository.findAllByUser(username);
     }
 }

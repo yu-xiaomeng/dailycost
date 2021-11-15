@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,5 +30,10 @@ public class CategoryController {
     @GetMapping("/{id}")
     public Optional<Category> findById(@PathVariable String id) {
         return categoryService.findById(id);
+    }
+
+    @GetMapping
+    public List<Category> findAllByUser() {
+        return categoryService.findAllByUser();
     }
 }
