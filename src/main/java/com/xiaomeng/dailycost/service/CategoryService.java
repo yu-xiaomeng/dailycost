@@ -52,4 +52,17 @@ public class CategoryService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return categoryRepository.findAllByUser(username);
     }
+
+    public void delete(String id) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Category> found = categoryRepository.findById(id);
+        if(found.isPresent()) {
+            if(found.get().getCreatedBy().equals(username)) {
+                categoryRepository.deleteById(id);
+                return;
+            }
+            throw new BusinessException(ReturnCode.RC_NO_DATA_ACCESS_AUTHRITY);
+        }
+        throw new BusinessException(ReturnCode.RC_ID_NOT_EXIST);
+    }
 }

@@ -36,4 +36,9 @@ public class CategoryController {
     public List<Category> findAllByUser() {
         return categoryService.findAllByUser();
     }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable String id) {
+        categoryService.delete(id);
+    }
 }
