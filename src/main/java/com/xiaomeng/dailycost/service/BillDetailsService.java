@@ -4,13 +4,16 @@ import com.xiaomeng.dailycost.base.ReturnCode;
 import com.xiaomeng.dailycost.domain.*;
 import com.xiaomeng.dailycost.dto.BillDetailsDto;
 import com.xiaomeng.dailycost.dto.BillDto;
+import com.xiaomeng.dailycost.dto.MonthlyBillDto;
 import com.xiaomeng.dailycost.exception.BusinessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Month;
 import java.util.*;
 
 @Service
@@ -48,9 +51,27 @@ public class BillDetailsService {
 
     }
 
-    public List<BillDetails> findByMonth(Date date) {
+    public MonthlyBillDto findMonthlyBill(Date date) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return billDetailsRepository.findByDate(date, username);
+
+        Double expense = billDetailsRepository.monthlyBillStat(date, "EXPENSE", username);
+        Double income = billDetailsRepository.monthlyBillStat(date, "INCOME", username);
+
+        MonthlyBillDto m = new MonthlyBillDto();
+        m.setDate(new SimpleDateFormat("yyyy-MM").format(date));
+
+        if (expense == null && income == null) {
+            return m;
+        } else if (expense == null || income == null) {
+            expense = (expense == null) ? 0 : expense;
+            income = (income == null) ? 0 : income;
+        }
+
+        m.setExpense(expense);
+        m.setIncome(income);
+        m.setBalance((double) Math.round((income-expense)*100)/100);
+
+        return m;
     }
 
     public BillDto findBillByDay(Date date) {

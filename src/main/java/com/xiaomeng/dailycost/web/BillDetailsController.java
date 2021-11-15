@@ -3,6 +3,7 @@ package com.xiaomeng.dailycost.web;
 import com.xiaomeng.dailycost.domain.BillDetails;
 import com.xiaomeng.dailycost.dto.BillDetailsDto;
 import com.xiaomeng.dailycost.dto.BillDto;
+import com.xiaomeng.dailycost.dto.MonthlyBillDto;
 import com.xiaomeng.dailycost.service.BillDetailsService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,13 @@ public class BillDetailsController {
     @DeleteMapping("/details/{id}")
     public void delete(@PathVariable String id) {
         billDetailsService.delete(id);
+    }
+
+    @GetMapping
+    public MonthlyBillDto monthlyBill(@RequestParam String date) throws ParseException {
+        Date d = new SimpleDateFormat("yyyy-MM").parse(date);
+        return billDetailsService.findMonthlyBill(d);
+
     }
 
 }
