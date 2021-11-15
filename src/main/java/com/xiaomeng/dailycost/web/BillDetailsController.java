@@ -78,4 +78,9 @@ public class BillDetailsController {
 
     }
 
+    @GetMapping("/yearly")
+    public List<MonthlyBillDto> yearlyBill(@RequestParam String year) throws ParseException {
+        return billDetailsService.findYearlyBill(year);
+    }
+
 }

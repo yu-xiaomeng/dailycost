@@ -74,6 +74,19 @@ public class BillDetailsService {
         return m;
     }
 
+    public List<MonthlyBillDto> findYearlyBill(String year) throws ParseException {
+        List<MonthlyBillDto> yearlyBill = new ArrayList<>();
+
+        for (int i = 12; i >= 1; i--) {
+            String dateStr = year + "-" + i;
+            Date monthDate = new SimpleDateFormat("yyyy-MM").parse(dateStr);
+
+            yearlyBill.add(findMonthlyBill(monthDate));
+        }
+
+        return yearlyBill;
+    }
+
     public BillDto findBillByDay(Date date) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         List<BillDetails> billDetails = billDetailsRepository.findByDay(date, username);
