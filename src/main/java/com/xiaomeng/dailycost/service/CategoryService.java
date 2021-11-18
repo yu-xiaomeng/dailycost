@@ -1,6 +1,7 @@
 package com.xiaomeng.dailycost.service;
 
 import com.xiaomeng.dailycost.base.ReturnCode;
+import com.xiaomeng.dailycost.domain.BillDetailsRepository;
 import com.xiaomeng.dailycost.domain.Category;
 import com.xiaomeng.dailycost.domain.CategoryIconRepository;
 import com.xiaomeng.dailycost.domain.CategoryRepository;
@@ -9,6 +10,7 @@ import com.xiaomeng.dailycost.exception.BusinessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,10 +18,12 @@ import java.util.Optional;
 public class CategoryService {
     private CategoryRepository categoryRepository;
     private CategoryIconRepository categoryIconRepository;
+    private BillDetailsRepository billDetailsRepository;
 
-    public CategoryService(CategoryRepository categoryRepository, CategoryIconRepository categoryIconRepository) {
+    public CategoryService(CategoryRepository categoryRepository, CategoryIconRepository categoryIconRepository, BillDetailsRepository billDetailsRepository) {
         this.categoryRepository = categoryRepository;
         this.categoryIconRepository = categoryIconRepository;
+        this.billDetailsRepository = billDetailsRepository;
     }
 
     public String create(CategoryDto categoryDto) throws BusinessException{
@@ -53,12 +57,14 @@ public class CategoryService {
         return categoryRepository.findAllByUser(username);
     }
 
+    @Transactional(rollbackOn = Exception.class)
     public void delete(String id) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Category> found = categoryRepository.findById(id);
         if(found.isPresent()) {
             if(found.get().getCreatedBy().equals(username)) {
                 categoryRepository.deleteById(id);
+                billDetailsRepository.deleteByCategoryId(id);
                 return;
             }
             throw new BusinessException(ReturnCode.RC_NO_DATA_ACCESS_AUTHRITY);
