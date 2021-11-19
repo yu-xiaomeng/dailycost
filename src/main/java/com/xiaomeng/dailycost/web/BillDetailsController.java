@@ -5,6 +5,8 @@ import com.xiaomeng.dailycost.dto.BillDetailsDto;
 import com.xiaomeng.dailycost.dto.BillDto;
 import com.xiaomeng.dailycost.dto.MonthlyBillDto;
 import com.xiaomeng.dailycost.service.BillDetailsService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +18,12 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/bill")
+@SecurityRequirement(name = "dailycostapi")
 public class BillDetailsController {
     @Autowired
     private BillDetailsService billDetailsService;
 
+    @Operation(summary = "create a new bill details")
     @PostMapping("/details")
     public Map<String, Object> create(@Valid @RequestBody BillDetailsDto billDetailsDto) throws Exception{
         try {
@@ -32,6 +36,7 @@ public class BillDetailsController {
 
     }
 
+    @Operation(summary = "get bill details list in one month")
     @SneakyThrows
     @GetMapping("/details/list")
     public List<BillDto> findBillDaily(@RequestParam String date) {
@@ -56,28 +61,33 @@ public class BillDetailsController {
         return result;
     }
 
+    @Operation(summary = "get bill details by its id")
     @GetMapping("/details/{id}")
     public Optional<BillDetails> findById(@PathVariable String id) {
         return billDetailsService.findById(id);
     }
 
+    @Operation(summary = "update one bill details")
     @PutMapping("/details")
     public String update(@Valid @RequestBody BillDetailsDto billDetailsDto) throws ParseException {
         return billDetailsService.update(billDetailsDto);
     }
 
+    @Operation(summary = "delete one bill details by its id")
     @DeleteMapping("/details/{id}")
     public void delete(@PathVariable String id) {
         billDetailsService.delete(id);
     }
 
-    @GetMapping
+    @Operation(summary = "get bill in one month")
+    @GetMapping("/monthly")
     public MonthlyBillDto monthlyBill(@RequestParam String date) throws ParseException {
         Date d = new SimpleDateFormat("yyyy-MM").parse(date);
         return billDetailsService.findMonthlyBill(d);
 
     }
 
+    @Operation(summary = "get bill in one year")
     @GetMapping("/yearly")
     public List<MonthlyBillDto> yearlyBill(@RequestParam String year) throws ParseException {
         return billDetailsService.findYearlyBill(year);

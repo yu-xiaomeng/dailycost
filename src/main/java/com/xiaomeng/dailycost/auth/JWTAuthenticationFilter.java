@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.xiaomeng.dailycost.auth.SecurityConstants.EXPIRATION_TIME;
 import static com.xiaomeng.dailycost.auth.SecurityConstants.SECRET;
@@ -59,10 +61,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(SECRET.getBytes()));
 
-        Cookie cookieToken = new Cookie("token", token);
-        res.addCookie(cookieToken);
-        Cookie cookieUser = new Cookie("user", username);
-        res.addCookie(cookieUser);
+        res.setContentType("application/json;charset=utf-8");
+        res.setStatus(200);
+        res.getWriter().write(String.format("{\"token\": \"%s\"}", token));
+        res.getWriter().flush();
     }
 
 
