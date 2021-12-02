@@ -69,8 +69,14 @@ public class BillDetailsController {
 
     @Operation(summary = "update one bill details")
     @PutMapping("/details")
-    public String update(@Valid @RequestBody BillDetailsDto billDetailsDto) throws ParseException {
-        return billDetailsService.update(billDetailsDto);
+    public Map<String, Object> update(@Valid @RequestBody BillDetailsDto billDetailsDto) throws ParseException {
+        try {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", billDetailsService.update(billDetailsDto));
+            return map;
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Operation(summary = "delete one bill details by its id")
