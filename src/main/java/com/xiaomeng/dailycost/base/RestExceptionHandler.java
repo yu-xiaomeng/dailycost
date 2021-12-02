@@ -33,7 +33,7 @@ public class RestExceptionHandler {
      * 抓取自定义异常
      */
     @ExceptionHandler(BaseException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResultData<String> exception(BaseException e) {
         return ResultData.fail(e.getErrorCode(),e.getMessage());
     }
