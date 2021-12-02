@@ -53,7 +53,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             if (e instanceof CredentialsExpiredException) {
                 res.setContentType("application/json;charset=UTF-8");
                 res.setStatus(401);
-                res.getWriter().write("{\"message\": \"token expired\"}");
+//                res.getWriter().write("{\"message\": \"token expired\"}");
+                res.getWriter().write(String.format("{\"code\": 401, \"message\": \"token expired\", \"timestamp\": %d }", System.currentTimeMillis()));
 //                objectMapper.writeValue(res.getWriter(), ReturnCode.RC_USERNAME_OR_PASSWORD_ERROR);
             }
             else {
