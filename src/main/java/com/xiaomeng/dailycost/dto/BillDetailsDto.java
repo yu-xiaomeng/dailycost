@@ -19,7 +19,7 @@ public class BillDetailsDto {
     private String type;
 
     @NotNull(message="amount must not be null")
-    @DecimalMin(value="0.0")
+    @DecimalMin(value="0.0", message = "amount must be greater than or equal to 0.0")
     private double amount;
 
     @Size(max=100, message="note length must less than 100")

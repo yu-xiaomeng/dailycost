@@ -17,4 +17,7 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
 
     @Query(value ="select * from category where created_by = ?1", nativeQuery = true)
     List<Category> findAllByUser(String username);
+
+    @Query(value ="select * from category where id = ?1 and created_by = ?2", nativeQuery = true)
+    Optional<Category> findByIdUser(String id, String username);
 }

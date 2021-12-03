@@ -35,6 +35,10 @@ public class BillDetailsService {
         String categoryId = billDetailsDto.getCategoryId();
         String type = billDetailsDto.getType();
 
+        if(!categoryRepository.findByIdUser(categoryId,username).isPresent()) {
+            throw new BusinessException(ReturnCode.RC_CATEGORY_ID_NOT_EXIST);
+        }
+
         if(categoryRepository.findByIdTypeUser(categoryId, type, username).isPresent()) {
             billDetails.setType(type);
         } else throw new BusinessException(ReturnCode.RC_CATEGORY_NOT_MATCH);
