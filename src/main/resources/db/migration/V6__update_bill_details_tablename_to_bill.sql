@@ -1,0 +1,1 @@
+ALTER  TABLE `bill_details` RENAME TO `bill`;

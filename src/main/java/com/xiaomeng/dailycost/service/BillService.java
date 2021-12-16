@@ -2,64 +2,62 @@ package com.xiaomeng.dailycost.service;
 
 import com.xiaomeng.dailycost.base.ReturnCode;
 import com.xiaomeng.dailycost.domain.*;
-import com.xiaomeng.dailycost.dto.BillDetailsDto;
 import com.xiaomeng.dailycost.dto.BillDto;
+import com.xiaomeng.dailycost.dto.BillStatDto;
 import com.xiaomeng.dailycost.dto.MonthlyBillDto;
 import com.xiaomeng.dailycost.exception.BusinessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Month;
 import java.util.*;
 
 @Service
-public class BillDetailsService {
-    private BillDetailsRepository billDetailsRepository;
+public class BillService {
+    private BillRepository billRepository;
     private CategoryRepository categoryRepository;
 
-    public BillDetailsService(BillDetailsRepository billDetailsRepository, CategoryRepository categoryRepository) {
-        this.billDetailsRepository = billDetailsRepository;
+    public BillService(BillRepository billRepository, CategoryRepository categoryRepository) {
+        this.billRepository = billRepository;
         this.categoryRepository = categoryRepository;
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public String create(BillDetailsDto billDetailsDto) throws Exception {
-        BillDetails billDetails = new BillDetails();
+    public String create(BillDto billDto) throws Exception {
+        Bill bill = new Bill();
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        billDetails.setCreatedBy(username);
+        bill.setCreatedBy(username);
 
-        String categoryId = billDetailsDto.getCategoryId();
-        String type = billDetailsDto.getType();
+        String categoryId = billDto.getCategoryId();
+        String type = billDto.getType();
 
         if(!categoryRepository.findByIdUser(categoryId,username).isPresent()) {
             throw new BusinessException(ReturnCode.RC_CATEGORY_ID_NOT_EXIST);
         }
 
         if(categoryRepository.findByIdTypeUser(categoryId, type, username).isPresent()) {
-            billDetails.setType(type);
+            bill.setType(type);
         } else throw new BusinessException(ReturnCode.RC_CATEGORY_NOT_MATCH);
 
-        billDetails.setCategoryId(categoryId);
-        billDetails.setAmount(billDetailsDto.getAmount());
-        billDetails.setNote(billDetailsDto.getNote());
-        billDetails.setDate(new SimpleDateFormat("yyyy-MM-dd").parse(billDetailsDto.getDate()));
+        bill.setCategoryId(categoryId);
+        bill.setAmount(billDto.getAmount());
+        bill.setNote(billDto.getNote());
+        bill.setDate(new SimpleDateFormat("yyyy-MM-dd").parse(billDto.getDate()));
 
-        billDetails.setCreatedTime(System.currentTimeMillis());
-        billDetails.setUpdatedTime(System.currentTimeMillis());
+        bill.setCreatedTime(System.currentTimeMillis());
+        bill.setUpdatedTime(System.currentTimeMillis());
 
-        return billDetailsRepository.saveAndFlush(billDetails).getId();
+        return billRepository.saveAndFlush(bill).getId();
 
     }
 
     public MonthlyBillDto findMonthlyBill(Date date) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        Double expense = billDetailsRepository.monthlyBillStat(date, "EXPENSE", username);
-        Double income = billDetailsRepository.monthlyBillStat(date, "INCOME", username);
+        Double expense = billRepository.monthlyBillStat(date, "EXPENSE", username);
+        Double income = billRepository.monthlyBillStat(date, "INCOME", username);
 
         MonthlyBillDto m = new MonthlyBillDto();
         m.setDate(new SimpleDateFormat("yyyy-MM").format(date));
@@ -91,32 +89,32 @@ public class BillDetailsService {
         return yearlyBill;
     }
 
-    public BillDto findBillByDay(Date date) {
+    public BillStatDto findBillByDay(Date date) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<BillDetails> billDetails = billDetailsRepository.findByDay(date, username);
+        List<Bill> bills = billRepository.findByDay(date, username);
 
 //        Map<String, Object> map = new HashMap<>();
-        BillDto billDto = new BillDto();
+        BillStatDto billStatDto = new BillStatDto();
 
         Double expense = 0.0;
         Double income = 0.0;
-        for (BillDetails bill: billDetails) {
+        for (Bill bill: bills) {
             if(bill.getType().equals("EXPENSE")) {
                 expense += bill.getAmount();
             } else if(bill.getType().equals("INCOME")) {
                 income += bill.getAmount();
             }
         }
-        billDto.setDate(new SimpleDateFormat("yyyy-MM-dd").format(date));
-        billDto.setExpense(expense);
-        billDto.setIncome(income);
-        billDto.setBillDetails(billDetails);
-        return billDto;
+        billStatDto.setDate(new SimpleDateFormat("yyyy-MM-dd").format(date));
+        billStatDto.setExpense(expense);
+        billStatDto.setIncome(income);
+        billStatDto.setBill(bills);
+        return billStatDto;
     }
 
-    public Optional<BillDetails> findById(String id) {
+    public Optional<Bill> findById(String id) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<BillDetails> foundBillDetails = billDetailsRepository.findById(id);
+        Optional<Bill> foundBillDetails = billRepository.findById(id);
         if (foundBillDetails.isPresent()) {
             if(foundBillDetails.get().getCreatedBy().equals(username)) {
                 return foundBillDetails;
@@ -127,44 +125,44 @@ public class BillDetailsService {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public String update(BillDetailsDto billDetailsDto) throws ParseException {
-        Optional<BillDetails> existedBillDetails = billDetailsRepository.findById(billDetailsDto.getId());
+    public String update(BillDto billDto) throws ParseException {
+        Optional<Bill> existedBillDetails = billRepository.findById(billDto.getId());
         if (existedBillDetails.isPresent()) {
-            BillDetails billDetails = new BillDetails();
-            billDetails.setId(billDetailsDto.getId());
+            Bill bill = new Bill();
+            bill.setId(billDto.getId());
 
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
             if (username.equals(existedBillDetails.get().getCreatedBy()) == false) {
                 throw new BusinessException(ReturnCode.RC_NO_DATA_ACCESS_AUTHRITY);
             }
-            billDetails.setCreatedBy(username);
+            bill.setCreatedBy(username);
 
-            String categoryId = billDetailsDto.getCategoryId();
-            String type = billDetailsDto.getType();
+            String categoryId = billDto.getCategoryId();
+            String type = billDto.getType();
 
             if(categoryRepository.findByIdTypeUser(categoryId, type, username).isPresent()) {
-                billDetails.setType(type);
+                bill.setType(type);
             } else throw new BusinessException(ReturnCode.RC_CATEGORY_NOT_MATCH);
 
-            billDetails.setCategoryId(categoryId);
-            billDetails.setAmount(billDetailsDto.getAmount());
-            billDetails.setNote(billDetailsDto.getNote());
-            billDetails.setDate(new SimpleDateFormat("yyyy-MM-dd").parse(billDetailsDto.getDate()));
+            bill.setCategoryId(categoryId);
+            bill.setAmount(billDto.getAmount());
+            bill.setNote(billDto.getNote());
+            bill.setDate(new SimpleDateFormat("yyyy-MM-dd").parse(billDto.getDate()));
 
-            billDetails.setCreatedTime(existedBillDetails.get().getCreatedTime());
-            billDetails.setUpdatedTime(System.currentTimeMillis());
+            bill.setCreatedTime(existedBillDetails.get().getCreatedTime());
+            bill.setUpdatedTime(System.currentTimeMillis());
 
-            return billDetailsRepository.saveAndFlush(billDetails).getId();
+            return billRepository.saveAndFlush(bill).getId();
         }
         throw new BusinessException(ReturnCode.RC_ID_NOT_EXIST);
     }
 
     public void delete(String id) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<BillDetails> found = billDetailsRepository.findById(id);
+        Optional<Bill> found = billRepository.findById(id);
         if(found.isPresent()) {
             if(found.get().getCreatedBy().equals(username)) {
-                billDetailsRepository.deleteById(id);
+                billRepository.deleteById(id);
                 return;
             }
             throw new BusinessException(ReturnCode.RC_NO_DATA_ACCESS_AUTHRITY);

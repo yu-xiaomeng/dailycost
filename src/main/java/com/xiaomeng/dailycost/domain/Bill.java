@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Data
 @Entity
-public class BillDetails {
+public class Bill {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")

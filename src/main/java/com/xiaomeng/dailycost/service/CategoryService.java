@@ -1,7 +1,7 @@
 package com.xiaomeng.dailycost.service;
 
 import com.xiaomeng.dailycost.base.ReturnCode;
-import com.xiaomeng.dailycost.domain.BillDetailsRepository;
+import com.xiaomeng.dailycost.domain.BillRepository;
 import com.xiaomeng.dailycost.domain.Category;
 import com.xiaomeng.dailycost.domain.CategoryIconRepository;
 import com.xiaomeng.dailycost.domain.CategoryRepository;
@@ -18,12 +18,12 @@ import java.util.Optional;
 public class CategoryService {
     private CategoryRepository categoryRepository;
     private CategoryIconRepository categoryIconRepository;
-    private BillDetailsRepository billDetailsRepository;
+    private BillRepository billRepository;
 
-    public CategoryService(CategoryRepository categoryRepository, CategoryIconRepository categoryIconRepository, BillDetailsRepository billDetailsRepository) {
+    public CategoryService(CategoryRepository categoryRepository, CategoryIconRepository categoryIconRepository, BillRepository billRepository) {
         this.categoryRepository = categoryRepository;
         this.categoryIconRepository = categoryIconRepository;
-        this.billDetailsRepository = billDetailsRepository;
+        this.billRepository = billRepository;
     }
 
     public String create(CategoryDto categoryDto) throws BusinessException{
@@ -64,7 +64,7 @@ public class CategoryService {
         if(found.isPresent()) {
             if(found.get().getCreatedBy().equals(username)) {
                 categoryRepository.deleteById(id);
-                billDetailsRepository.deleteByCategoryId(id);
+                billRepository.deleteByCategoryId(id);
                 return;
             }
             throw new BusinessException(ReturnCode.RC_NO_DATA_ACCESS_AUTHRITY);
