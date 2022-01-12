@@ -95,10 +95,10 @@ public class BillService {
     private List<BillCategoryDto> findBillAndCategoryByDay(Date date) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         List<Bill> bills = billRepository.findByDay(date, username);
-        BillCategoryDto billCategoryDto = new BillCategoryDto();
         List<BillCategoryDto> billCategoryDtos = new ArrayList<>();
 
         for (Bill bill: bills) {
+            BillCategoryDto billCategoryDto = new BillCategoryDto();
             billCategoryDto.setBill(bill);
             Optional<Category> category= categoryRepository.findById(bill.getCategoryId());
             if (category.isPresent()) {
