@@ -2,6 +2,7 @@ package com.xiaomeng.dailycost.service;
 
 import com.xiaomeng.dailycost.base.ReturnCode;
 import com.xiaomeng.dailycost.domain.*;
+import com.xiaomeng.dailycost.dto.BillCategoryDto;
 import com.xiaomeng.dailycost.dto.BillDto;
 import com.xiaomeng.dailycost.dto.BillStatDto;
 import com.xiaomeng.dailycost.dto.MonthlyBillDto;
@@ -18,10 +19,12 @@ import java.util.*;
 public class BillService {
     private BillRepository billRepository;
     private CategoryRepository categoryRepository;
+    private CategoryIconRepository categoryIconRepository;
 
-    public BillService(BillRepository billRepository, CategoryRepository categoryRepository) {
+    public BillService(BillRepository billRepository, CategoryRepository categoryRepository, CategoryIconRepository categoryIconRepository) {
         this.billRepository = billRepository;
         this.categoryRepository = categoryRepository;
+        this.categoryIconRepository = categoryIconRepository;
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -89,20 +92,46 @@ public class BillService {
         return yearlyBill;
     }
 
-    public BillStatDto findBillByDay(Date date) {
+    private List<BillCategoryDto> findBillAndCategoryByDay(Date date) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         List<Bill> bills = billRepository.findByDay(date, username);
+        BillCategoryDto billCategoryDto = new BillCategoryDto();
+        List<BillCategoryDto> billCategoryDtos = new ArrayList<>();
+
+        for (Bill bill: bills) {
+            billCategoryDto.setBill(bill);
+            Optional<Category> category= categoryRepository.findById(bill.getCategoryId());
+            if (category.isPresent()) {
+                billCategoryDto.setCategoryName(category.get().getName());
+                Optional<CategoryIcon> categoryIcon = categoryIconRepository.findById(category.get().getIconId());
+                if(categoryIcon.isPresent()) {
+                    billCategoryDto.setCategoryIconUrl(categoryIcon.get().getUrl());
+                }
+//                else billCategoryDto.setCategoryIconUrl("https://raw.githubusercontent.com/yu-xiaomeng/dailycost/main/src/main/resources/static/icon_png/meals.png");
+            }
+//            else billCategoryDto.setCategoryName("类别名称");
+            billCategoryDtos.add(billCategoryDto);
+        }
+
+        return billCategoryDtos;
+    }
+
+    public BillStatDto findBillByDay(Date date) {
+        List<BillCategoryDto> bills = findBillAndCategoryByDay(date);
 
 //        Map<String, Object> map = new HashMap<>();
         BillStatDto billStatDto = new BillStatDto();
 
         Double expense = 0.0;
         Double income = 0.0;
-        for (Bill bill: bills) {
-            if(bill.getType().equals("EXPENSE")) {
-                expense += bill.getAmount();
-            } else if(bill.getType().equals("INCOME")) {
-                income += bill.getAmount();
+        for (BillCategoryDto bill: bills) {
+            if (categoryRepository.findById(bill.getBill().getCategoryId()).isPresent()) {
+
+            } else throw new BusinessException(ReturnCode.RC_CATEGORY_NOT_MATCH);
+            if(bill.getBill().getType().equals("EXPENSE")) {
+                expense += bill.getBill().getAmount();
+            } else if(bill.getBill().getType().equals("INCOME")) {
+                income += bill.getBill().getAmount();
             }
         }
         billStatDto.setDate(new SimpleDateFormat("yyyy-MM-dd").format(date));

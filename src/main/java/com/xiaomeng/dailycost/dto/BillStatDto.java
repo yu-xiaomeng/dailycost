@@ -10,5 +10,6 @@ public class BillStatDto {
     private String date;
     private Double expense;
     private Double income;
-    private List<Bill> bill;
+    private List<BillCategoryDto> bill;
+
 }
