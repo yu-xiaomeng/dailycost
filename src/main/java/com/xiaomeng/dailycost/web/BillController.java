@@ -1,6 +1,7 @@
 package com.xiaomeng.dailycost.web;
 
 import com.xiaomeng.dailycost.domain.Bill;
+import com.xiaomeng.dailycost.dto.BillCategoryDto;
 import com.xiaomeng.dailycost.dto.BillDto;
 import com.xiaomeng.dailycost.dto.BillStatDto;
 import com.xiaomeng.dailycost.dto.MonthlyBillDto;
@@ -63,7 +64,7 @@ public class BillController {
 
     @Operation(summary = "get bill details by its id")
     @GetMapping("/{id}")
-    public Optional<Bill> findById(@PathVariable String id) {
+    public Optional<BillCategoryDto> findById(@PathVariable String id) {
         return billService.findById(id);
     }
 

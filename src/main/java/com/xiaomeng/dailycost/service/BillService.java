@@ -98,22 +98,26 @@ public class BillService {
         List<BillCategoryDto> billCategoryDtos = new ArrayList<>();
 
         for (Bill bill: bills) {
-            BillCategoryDto billCategoryDto = new BillCategoryDto();
-            billCategoryDto.setBill(bill);
-            Optional<Category> category= categoryRepository.findById(bill.getCategoryId());
-            if (category.isPresent()) {
-                billCategoryDto.setCategoryName(category.get().getName());
-                Optional<CategoryIcon> categoryIcon = categoryIconRepository.findById(category.get().getIconId());
-                if(categoryIcon.isPresent()) {
-                    billCategoryDto.setCategoryIconUrl(categoryIcon.get().getUrl());
-                }
-//                else billCategoryDto.setCategoryIconUrl("https://raw.githubusercontent.com/yu-xiaomeng/dailycost/main/src/main/resources/static/icon_png/meals.png");
-            }
-//            else billCategoryDto.setCategoryName("类别名称");
+            BillCategoryDto billCategoryDto = getBillCategoryDto(bill);
             billCategoryDtos.add(billCategoryDto);
         }
 
         return billCategoryDtos;
+    }
+
+    private BillCategoryDto getBillCategoryDto(Bill bill) {
+        BillCategoryDto billCategoryDto = new BillCategoryDto();
+        billCategoryDto.setBill(bill);
+        Optional<Category> category= categoryRepository.findById(bill.getCategoryId());
+        if (category.isPresent()) {
+            billCategoryDto.setCategoryName(category.get().getName());
+            Optional<CategoryIcon> categoryIcon = categoryIconRepository.findById(category.get().getIconId());
+            if(categoryIcon.isPresent()) {
+                billCategoryDto.setCategoryIconUrl(categoryIcon.get().getUrl());
+            }
+
+        }
+        return billCategoryDto;
     }
 
     public BillStatDto findBillByDay(Date date) {
@@ -141,12 +145,13 @@ public class BillService {
         return billStatDto;
     }
 
-    public Optional<Bill> findById(String id) {
+    public Optional<BillCategoryDto> findById(String id) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Bill> foundBillDetails = billRepository.findById(id);
         if (foundBillDetails.isPresent()) {
             if(foundBillDetails.get().getCreatedBy().equals(username)) {
-                return foundBillDetails;
+                Optional<BillCategoryDto> billCategoryDto = Optional.of(getBillCategoryDto(foundBillDetails.get()));
+                return billCategoryDto;
             }
             throw new BusinessException(ReturnCode.RC_NO_DATA_ACCESS_AUTHRITY);
         }
