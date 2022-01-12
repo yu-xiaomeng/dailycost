@@ -44,7 +44,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                             creds.getPassword())
             );
         } catch (Exception e) {
-//            throw new AuthenticationException("please enter correct username and password");
             throw new RuntimeException(e);
         }
     }

@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xiaomeng.dailycost.base.ReturnCode;
+import com.xiaomeng.dailycost.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,6 +18,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.plaf.nimbus.NimbusStyle;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,13 +51,10 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             chain.doFilter(req, res);
         } catch (Exception e) {
-//            System.out.println("已捕获异常 {}"+ e.getClass().getName());
             if (e instanceof CredentialsExpiredException) {
                 res.setContentType("application/json;charset=UTF-8");
                 res.setStatus(401);
-//                res.getWriter().write("{\"message\": \"token expired\"}");
                 res.getWriter().write(String.format("{\"code\": 401, \"message\": \"token expired\", \"timestamp\": %d }", System.currentTimeMillis()));
-//                objectMapper.writeValue(res.getWriter(), ReturnCode.RC_USERNAME_OR_PASSWORD_ERROR);
             }
             else {
                 throw e;
