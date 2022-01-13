@@ -39,8 +39,9 @@ public class UserController {
     @GetMapping("/user")
     @SecurityRequirement(name = "dailycostapi")
     public Map<String, Object> userProfile() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("avatar", userService.getProfile());
-        return map;
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("avatar", userService.getProfile());
+//        map.put("username",userService.)
+        return userService.getProfile();
     }
 }

@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.xiaomeng.dailycost.base.ReturnCode.*;
@@ -66,9 +68,12 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public String getProfile() {
+    public Map<String, Object> getProfile() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findAvatar(username);
+        Map<String, Object> map = new HashMap<>();
+        map.put("username", username);
+        map.put("avatar", userRepository.findAvatar(username));
+        return map;
     }
 
     @Override
